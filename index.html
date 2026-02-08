@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verificación de Permisos - Aguascalientes</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Arial, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f5f5;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        /* Header y logo */
+        header {
+            background-color: #fff;
+            padding: 20px 0;
+            border-bottom: 1px solid #ddd;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            margin-bottom: 30px;
+        }
+        
+        .logo-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .logo {
+            max-height: 80px;
+            max-width: 100%;
+        }
+        
+        .logo-placeholder {
+            width: 250px;
+            height: 80px;
+            background-color: #e9e9e9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #777;
+            font-weight: bold;
+            border-radius: 4px;
+            border: 2px dashed #ccc;
+        }
+        
+        /* Título principal */
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: #7f8c8d;
+            margin-bottom: 30px;
+            font-size: 16px;
+        }
+        
+        /* Buscador */
+        .search-container {
+            background-color: #fff;
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+            margin-bottom: 40px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .search-title {
+            font-size: 20px;
+            margin-bottom: 20px;
+            color: #2c3e50;
+            text-align: center;
+        }
+        
+        .search-form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        label {
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+        }
+        
+        .input-with-button {
+            display: flex;
+            gap: 10px;
+        }
+        
+        input[type="text"] {
+            padding: 14px 15px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 16px;
+            transition: border 0.3s;
+            flex: 1;
+        }
+        
+        input[type="text"]:focus {
+            border-color: #3498db;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+        }
+        
+        .search-button {
+            background-color: #2c5aa0;
+            color: white;
+            border: none;
+            padding: 0 30px;
+            border-radius: 6px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            white-space: nowrap;
+        }
+        
+        .search-button:hover {
+            background-color: #1f4a8e;
+        }
+        
+        .search-button:active {
+            transform: translateY(1px);
+        }
+        
+        .form-hint {
+            font-size: 14px;
+            color: #7f8c8d;
+            margin-top: 5px;
+        }
+        
+        /* Resultados */
+        .results-container {
+            background-color: #fff;
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+            display: none; /* Oculto inicialmente */
+        }
+        
+        .results-title {
+            font-size: 22px;
+            margin-bottom: 25px;
+            color: #2c3e50;
+            border-bottom: 2px solid #f1f1f1;
+            padding-bottom: 10px;
+        }
+        
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        
+        .result-item {
+            padding: 15px 0;
+            border-bottom: 1px solid #f1f1f1;
+        }
+        
+        .result-label {
+            font-weight: 600;
+            color: #555;
+            margin-bottom: 5px;
+        }
+        
+        .result-value {
+            color: #333;
+            font-size: 18px;
+        }
+        
+        /* Mensaje de carga */
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #7f8c8d;
+            font-size: 18px;
+            display: none;
+        }
+        
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-radius: 50%;
+            border-top: 4px solid #2c5aa0;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Mensajes de error y validación */
+        .error-message {
+            background-color: #fee;
+            color: #c33;
+            padding: 15px;
+            border-radius: 6px;
+            margin-top: 20px;
+            border-left: 4px solid #c33;
+            display: none;
+        }
+        
+        .validation-error {
+            color: #c33;
+            font-size: 14px;
+            margin-top: 5px;
+            display: none;
+        }
+        
+        /* Pie de página */
+        footer {
+            margin-top: 40px;
+            text-align: center;
+            color: #95a5a6;
+            font-size: 14px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+            
+            .search-container, .results-container {
+                padding: 20px;
+            }
+            
+            .results-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            h1 {
+                font-size: 24px;
+            }
+            
+            .input-with-button {
+                flex-direction: column;
+            }
+            
+            .search-button {
+                padding: 16px 20px;
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="logo-container">
+               
+               
+                <img src="https://i.postimg.cc/W3p8JNDv/IMG-4002.jpg" alt="Logo" class="logo">
+            
+            </div>
+        </div>
+    </header>
+    
+    <main class="container">
+        <h1>VERIFICACIÓN DE PERMISOS</h1>
+        <p class="subtitle">Consulta el estado de tu permiso ingresando el número de folio</p>
+        
+        <div class="search-container">
+            <h2 class="search-title">Ingresa tu folio</h2>
+            <form class="search-form" id="searchForm">
+                <div class="form-group">
+                    <label for="folio">Número de folio (5 dígitos)</label>
+                    <div class="input-with-button">
+                        <input type="text" id="folio" name="folio" placeholder="Ej: 38970" maxlength="5" required>
+                        <button type="submit" class="search-button">BUSCAR</button>
+                    </div>
+                    <div class="validation-error" id="folioError">
+                        El folio debe contener exactamente 5 dígitos numéricos.
+                    </div>
+                    <p class="form-hint">Solo se permiten números (máximo 5 dígitos)</p>
+                </div>
+            </form>
+            
+            <div class="error-message" id="errorMessage">
+                Folio no encontrado. Verifica el número e intenta nuevamente.
+            </div>
+        </div>
+        
+        <div class="loading" id="loadingMessage">
+            <div class="spinner"></div>
+            <p>Consultando la Base de Datos...</p>
+        </div>
+        
+        <div class="results-container" id="resultsContainer">
+            <h2 class="results-title">INFORMACIÓN DEL PERMISO</h2>
+            <div class="results-grid" id="resultsGrid">
+                <!-- Los datos se insertarán aquí dinámicamente -->
+            </div>
+        </div>
+    </main>
+    
+    <script>
+        // Datos de ejemplo organizados por folio (5 dígitos)
+        const datosEjemplo = {
+            "38970": {
+                "Propietario": "Juan Pérez González",
+                "Número de serie / VIN": "WOLTG52F125251301",
+                "Marca del vehículo": "Nissan",
+                "Modelo": "Versa",
+                "Año": "2022",
+                "Color": "Blanco",
+                "Número de permiso": "38970",
+                "Vigencia del permiso": "31 de diciembre de 2026",
+                "Estado del permiso": "Vigente",
+                "Fecha de expedición": "15 de marzo de 2023",
+                "Tipo de permiso": "Particular",
+                "Placas": "ABC-123"
+            },
+            "12345": {
+                "Propietario": "María García López",
+                "Número de serie / VIN": "ABC123456789",
+                "Marca del vehículo": "Toyota",
+                "Modelo": "Corolla",
+                "Año": "2021",
+                "Color": "Gris",
+                "Número de permiso": "12345",
+                "Vigencia del permiso": "30 de junio de 2025",
+                "Estado del permiso": "Vigente",
+                "Fecha de expedición": "10 de enero de 2022",
+                "Tipo de permiso": "Público",
+                "Placas": "DEF-456"
+            },
+            "54321": {
+                "Propietario": "Carlos Rodríguez Martínez",
+                "Número de serie / VIN": "XYZ987654321",
+                "Marca del vehículo": "Ford",
+                "Modelo": "F-150",
+                "Año": "2020",
+                "Color": "Negro",
+                "Número de permiso": "54321",
+                "Vigencia del permiso": "15 de agosto de 2024",
+                "Estado del permiso": "Por vencer",
+                "Fecha de expedición": "20 de mayo de 2021",
+                "Tipo de permiso": "Comercial",
+                "Placas": "GHI-789"
+            },
+            "98765": {
+                "Propietario": "Ana Sánchez Ruiz",
+                "Número de serie / VIN": "MNO456123789",
+                "Marca del vehículo": "Volkswagen",
+                "Modelo": "Jetta",
+                "Año": "2023",
+                "Color": "Azul",
+                "Número de permiso": "98765",
+                "Vigencia del permiso": "31 de diciembre de 2027",
+                "Estado del permiso": "Vigente",
+                "Fecha de expedición": "5 de febrero de 2023",
+                "Tipo de permiso": "Particular",
+                "Placas": "JKL-012"
+            }
+        };
+        
+        // Validar que solo sean números
+        function validarFolio(folio) {
+            // Verificar que sea exactamente 5 dígitos y solo números
+            return /^\d{5}$/.test(folio);
+        }
+        
+        // Restringir entrada a solo números
+        document.getElementById('folio').addEventListener('input', function(e) {
+            // Remover cualquier carácter que no sea número
+            this.value = this.value.replace(/\D/g, '');
+            
+            // Limitar a 5 dígitos
+            if (this.value.length > 5) {
+                this.value = this.value.slice(0, 5);
+            }
+            
+            // Ocultar mensaje de error si se está corrigiendo
+            document.getElementById('folioError').style.display = 'none';
+        });
+        
+        // Manejar el envío del formulario
+        document.getElementById('searchForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Obtener valor del formulario
+            const folio = document.getElementById('folio').value.trim();
+            
+            // Validar el folio
+            if (!validarFolio(folio)) {
+                document.getElementById('folioError').style.display = 'block';
+                document.getElementById('folio').focus();
+                return;
+            }
+            
+            // Ocultar mensajes de error
+            document.getElementById('folioError').style.display = 'none';
+            document.getElementById('errorMessage').style.display = 'none';
+            
+            // Mostrar mensaje de carga
+            document.getElementById('loadingMessage').style.display = 'block';
+            document.getElementById('resultsContainer').style.display = 'none';
+            
+            // Simular consulta a la base de datos (con tiempo de espera)
+            setTimeout(function() {
+                // Ocultar mensaje de carga
+                document.getElementById('loadingMessage').style.display = 'none';
+                
+                // Verificar si el folio existe
+                const datos = datosEjemplo[folio];
+                
+                if (datos) {
+                    // Mostrar resultados
+                    mostrarResultados(datos);
+                } else {
+                    // Mostrar error
+                    document.getElementById('errorMessage').style.display = 'block';
+                }
+            }, 1200); // 1.2 segundos de simulación de carga
+        });
+        
+        // Función para mostrar los resultados en la página
+        function mostrarResultados(datos) {
+            const resultsGrid = document.getElementById('resultsGrid');
+            resultsGrid.innerHTML = '';
+            
+            // Crear elementos para cada dato
+            for (const [clave, valor] of Object.entries(datos)) {
+                const item = document.createElement('div');
+                item.className = 'result-item';
+                
+                item.innerHTML = `
+                    <div class="result-label">${clave}</div>
+                    <div class="result-value">${valor}</div>
+                `;
+                
+                resultsGrid.appendChild(item);
+            }
+            
+            // Mostrar el contenedor de resultados
+            document.getElementById('resultsContainer').style.display = 'block';
+            
+            // Desplazar la vista hacia los resultados
+            document.getElementById('resultsContainer').scrollIntoView({ 
+                behavior: 'smooth' 
+            });
+        }
+        
+        // Cargar datos de ejemplo automáticamente al inicio (opcional)
+        window.addEventListener('DOMContentLoaded', function() {
+            // Prellenar formulario con datos de ejemplo para facilitar pruebas
+            document.getElementById('folio').value = "38970";
+            
+            // Enfocar el campo de folio
+            document.getElementById('folio').focus();
+        });
+    </script>
+</body>
+</html>
